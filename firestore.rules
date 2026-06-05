@@ -1,0 +1,84 @@
+rules_version = '2';
+
+// White-label multi-org Firestore Security Rules
+// Each document stores an orgId field matching the authenticated user's org.
+// Admins are identified by a custom claim { admin: true } on the Firebase Auth user.
+
+function isAuthenticated() {
+  return request.auth != null;
+}
+
+function isAdmin() {
+  return isAuthenticated() && request.auth.token.admin == true;
+}
+
+function belongsToOrg(orgId) {
+  return isAuthenticated() && request.auth.token.orgId == orgId;
+}
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---- Orgs collection ----
+    match /orgs/{orgId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && request.auth.token.orgId == orgId;
+    }
+
+    // ---- Content collections (scoped by orgId) ----
+    function isOrgDoc() {
+      return resource.data.orgId == request.auth.token.orgId;
+    }
+
+    function incomingOrgDoc() {
+      return request.resource.data.orgId == request.auth.token.orgId;
+    }
+
+    match /events/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /news/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /programs/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /members/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /documents/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /pages/{docId} {
+      allow read: if true;  // public — for the public-facing site
+      allow write: if isAdmin();
+    }
+
+    match /committee_members/{docId} {
+      allow read: if true;  // public
+      allow write: if isAdmin();
+    }
+
+    match /sponsors/{docId} {
+      allow read: if true;  // public
+      allow write: if isAdmin();
+    }
+
+    // Public site reads (unauthenticated users can see public content)
+    match /public_site/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

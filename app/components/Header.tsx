@@ -26,7 +26,7 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
         </button>
 
         <div>
-          <h1 className="font-serif font-bold text-gray-900">{user?.org}</h1>
+          <h1 className="font-serif font-bold text-gray-900 dark:text-white">{user?.orgName}</h1>
           <p className="text-xs text-gray-600">Org Admin</p>
         </div>
       </div>

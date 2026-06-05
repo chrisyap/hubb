@@ -1,11 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { useAuth } from "../auth-context";
-import AdminHeader from "../components/AdminHeader";
-import AdminSidebar from "../components/AdminSidebar";
+import Header from "../components/Header";
+import Sidebar from "../components/Sidebar";
 
 export default function AdminLayout({
   children,
@@ -14,6 +14,7 @@ export default function AdminLayout({
 }) {
   const { user, isLoading } = useAuth();
   const router = useRouter();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -34,11 +35,11 @@ export default function AdminLayout({
   }
 
   return (
-    <div className="grid grid-cols-[280px_1fr] min-h-screen bg-gray-50">
-      <AdminSidebar />
-      <div className="flex flex-col">
-        <AdminHeader />
-        <main className="flex-1 overflow-auto">{children}</main>
+    <div className="flex h-screen">
+      <Sidebar isOpen={isSidebarOpen} />
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <Header onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
+        <main className="flex-1 overflow-auto px-8 py-6">{children}</main>
       </div>
     </div>
   );

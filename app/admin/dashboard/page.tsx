@@ -1,135 +1,266 @@
-"use client"
+"use client";
+
+import { useAuth } from "@/app/auth-context";
+import { useContent, type Event, type Member } from "@/app/lib/use-content";
+import { Button } from "@/app/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/app/components/ui/card";
+import {
+  Users,
+  Calendar,
+  TrendingUp,
+  FileText,
+  Loader2,
+} from "lucide-react";
 
 export default function Dashboard() {
+  const { user } = useAuth();
+  const { data: events, isLoading: eventsLoading } = useContent<Event>(
+    "events",
+    user?.orgId
+  );
+  const { data: members, isLoading: membersLoading } = useContent<Member>(
+    "members",
+    user?.orgId
+  );
+
+  const loading = eventsLoading || membersLoading;
+
+  const publishedEvents =
+    events?.filter((e) => e.published === true || e.published === undefined) ||
+    [];
+  const upcomingEvents = publishedEvents
+    .filter((e) => new Date(e.date) >= new Date())
+    .slice(0, 3);
+  const activeMembers =
+    members?.filter((m) => m.status === "active") || [];
+  const pendingMembers =
+    members?.filter((m) => m.status === "pending") || [];
+
   const stats = [
-    { label: "Active Members", value: "248", change: "↑ 12 this month" },
-    { label: "Upcoming Events", value: "3", change: "Next: Jun 15" },
-    { label: "Funds Raised", value: "$4.2k", change: "↑ 18% vs last year" },
-    { label: "Documents", value: "24", change: "6 pending review" },
-  ]
+    {
+      label: "Active Members",
+      value: activeMembers.length.toString(),
+      change: `${pendingMembers.length} pending`,
+      icon: Users,
+    },
+    {
+      label: "Upcoming Events",
+      value: upcomingEvents.length.toString(),
+      change: "Next: " + (upcomingEvents[0]?.date ? new Date(upcomingEvents[0].date).toLocaleDateString() : "None"),
+      icon: Calendar,
+    },
+    {
+      label: "Total Events",
+      value: publishedEvents.length.toString(),
+      change: `${events?.filter(e => !e.published).length || 0} drafts`,
+      icon: TrendingUp,
+    },
+    {
+      label: "Total Members",
+      value: (members?.length || 0).toString(),
+      change: `${activeMembers.length} active`,
+      icon: FileText,
+    },
+  ];
 
-  const recentActivity = [
-    { text: "Sarah Johnson joined as member", time: "2 hours ago" },
-    { text: "New event created: Book Fair", time: "5 hours ago" },
-    { text: "Q3 budget approved", time: "1 day ago" },
-    { text: "12 new signups this week", time: "2 days ago" },
-  ]
-
-  const upcomingEvents = [
-    { name: "Book Fair", date: "Jun 15 • 48 RSVPs", badge: "Active" },
-    { name: "AGM Meeting", date: "Jun 22 • 12 RSVPs", badge: "Scheduled" },
-    { name: "School Canteen", date: "Jun 18 • 156 RSVPs", badge: "Full" },
-  ]
+  const recentActivity = (events || [])
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    )
+    .slice(0, 4)
+    .map((e) => ({
+      text: `${e.title}${e.published !== false ? "" : " (draft)"}`,
+      time: new Date(e.createdAt).toLocaleDateString(),
+      type: "event",
+    }));
 
   const todos = [
-    "Approve 6 pending docs",
-    "Review applications",
-    "Send meeting reminder",
-  ]
+    pendingMembers.length > 0
+      ? `Approve ${pendingMembers.length} pending member${pendingMembers.length !== 1 ? "s" : ""}`
+      : null,
+    events && events.filter((e) => !e.published).length > 0
+      ? `Publish ${events.filter((e) => !e.published).length} draft event${events.filter((e) => !e.published).length !== 1 ? "s" : ""}`
+      : null,
+    "Review upcoming schedule",
+  ].filter(Boolean) as string[];
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   return (
-    <div className="p-8">
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-        {stats.map((stat, i) => (
-          <div
-            key={i}
-            className="bg-white border border-gray-200 rounded-xl p-6 hover:border-gray-300 hover:shadow-sm transition"
-          >
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
-              {stat.label}
+    <>
+      {/* Header */}
+      <div className="bg-linear-to-r from-emerald-700 to-emerald-500 text-white px-8 py-12 -mx-8 -mt-6 mb-8">
+        <h1 className="text-4xl font-serif font-bold mb-2">Dashboard</h1>
+        <p className="text-emerald-50">
+          Welcome back{user?.name ? `, ${user.name}` : ""}. Here&apos;s
+          your community at a glance.
+        </p>
+      </div>
+
+      {/* Stats grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {stats.map((stat, i) => {
+          const Icon = stat.icon;
+          return (
+            <Card key={i}>
+              <CardHeader className="pb-2 flex flex-row items-center justify-between">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  {stat.label}
+                </p>
+                <Icon className="w-5 h-5 text-muted-foreground/50" />
+              </CardHeader>
+              <CardContent>
+                <p className="text-4xl font-bold mb-1">{stat.value}</p>
+                <p className="text-sm text-emerald-600 dark:text-emerald-400">
+                  {stat.change}
+                </p>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+
+      {/* Charts & Activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Recent activity</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {recentActivity.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                No activity yet. Create your first event to get started.
+              </p>
+            ) : (
+              <div className="space-y-4">
+                {recentActivity.map((item, i) => (
+                  <div
+                    key={i}
+                    className={
+                      i < recentActivity.length - 1
+                        ? "pb-4 border-b border-border"
+                        : ""
+                    }
+                  >
+                    <div className="flex gap-3">
+                      <div className="w-2 h-2 rounded-full mt-2 shrink-0 bg-emerald-600" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm">{item.text}</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {item.time}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Upcoming events</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {upcomingEvents.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                No upcoming events
+              </p>
+            ) : (
+              <div className="space-y-4">
+                {upcomingEvents.map((event, i) => (
+                  <div
+                    key={i}
+                    className={
+                      i < upcomingEvents.length - 1
+                        ? "pb-4 border-b border-border"
+                        : ""
+                    }
+                  >
+                    <p className="font-semibold text-sm">{event.title}</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {new Date(event.date).toLocaleDateString()}
+                      {event.attendees !== undefined
+                        ? ` · ${event.attendees} RSVPs`
+                        : ""}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* To-do list */}
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>To-do list</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {todos.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              Nothing to do — you&apos;re all caught up!
             </p>
-            <p className="text-3xl font-bold text-gray-900 mb-2">{stat.value}</p>
-            <p className="text-sm text-green-600 font-medium">{stat.change}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-8">
-        <div className="lg:col-span-2 bg-white border border-gray-200 rounded-xl p-6">
-          <h3 className="text-base font-semibold text-gray-900 mb-6">Member Growth</h3>
-          <div className="h-56 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg flex items-center justify-center text-gray-400 text-sm">
-            Interactive member growth chart
-          </div>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-6">
-          <h3 className="text-base font-semibold text-gray-900 mb-6">Event Attendance</h3>
-          <div className="h-40 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg flex items-center justify-center text-gray-400 text-sm">
-            Attendance data
-          </div>
-        </div>
-      </div>
-
-      {/* Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-8">
-        {/* Recent Activity */}
-        <div className="lg:col-span-2 bg-white border border-gray-200 rounded-xl p-6">
-          <h3 className="text-base font-semibold text-gray-900 mb-6">Recent Activity</h3>
-          <div className="space-y-4">
-            {recentActivity.map((item, i) => (
-              <div
-                key={i}
-                className={`flex gap-3 ${i < recentActivity.length - 1 ? "pb-4 border-b border-gray-100" : ""}`}
-              >
-                <div className="w-2 h-2 rounded-full bg-green-700 mt-1.5 flex-shrink-0" />
-                <div className="flex-1">
-                  <p className="text-sm text-gray-900 font-medium">{item.text}</p>
-                  <p className="text-xs text-gray-500 mt-1">{item.time}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Upcoming Events */}
-        <div className="bg-white border border-gray-200 rounded-xl p-6">
-          <h3 className="text-base font-semibold text-gray-900 mb-6">Upcoming Events</h3>
-          <div className="space-y-4">
-            {upcomingEvents.map((event, i) => (
-              <div key={i} className={i < upcomingEvents.length - 1 ? "pb-4 border-b border-gray-100" : ""}>
-                <p className="text-sm font-semibold text-gray-900">{event.name}</p>
-                <p className="text-xs text-gray-500 mt-1">{event.date}</p>
-                <span className="inline-block mt-2 px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded">
-                  {event.badge}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* To-Do List */}
-      <div className="bg-white border border-gray-200 rounded-xl p-6 mb-8">
-        <h3 className="text-base font-semibold text-gray-900 mb-6">To-Do List</h3>
-        <div className="space-y-3">
-          {todos.map((todo, i) => (
-            <label key={i} className="flex items-center gap-3 cursor-pointer">
-              <input type="checkbox" className="w-4 h-4 rounded" />
-              <span className="text-sm text-gray-900">{todo}</span>
-            </label>
-          ))}
-        </div>
-      </div>
+          ) : (
+            <div className="space-y-3">
+              {todos.map((todo, i) => (
+                <label
+                  key={i}
+                  className="flex items-center gap-3 cursor-pointer"
+                >
+                  <input type="checkbox" className="w-4 h-4" />
+                  <span className="text-sm">{todo}</span>
+                </label>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Quick Actions */}
-      <div className="bg-white border border-gray-200 rounded-xl p-6">
-        <h3 className="text-base font-semibold text-gray-900 mb-6">Quick Actions</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <button className="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
-            + Create Event
-          </button>
-          <button className="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
-            + Announcement
-          </button>
-          <button className="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
-            + Upload Doc
-          </button>
-          <button className="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
-            + Add Member
-          </button>
-        </div>
-      </div>
-    </div>
-  )
+      <Card>
+        <CardHeader>
+          <CardTitle>Quick actions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <Button
+              onClick={() => (window.location.href = "/admin/events")}
+            >
+              + Create event
+            </Button>
+            <Button
+              onClick={() => (window.location.href = "/admin/news")}
+            >
+              + New announcement
+            </Button>
+            <Button
+              onClick={() => (window.location.href = "/admin/documents")}
+            >
+              + Upload document
+            </Button>
+            <Button
+              onClick={() => (window.location.href = "/admin/members")}
+            >
+              + Manage members
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </>
+  );
 }

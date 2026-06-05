@@ -1,117 +1,195 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Save } from "lucide-react"
+import { useState, useEffect } from "react";
+import { useAuth } from "@/app/auth-context";
+import { Button } from "@/app/components/ui/button";
+import { Input } from "@/app/components/ui/input";
+import { Label } from "@/app/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/app/components/ui/card";
+import { Save, Loader2 } from "lucide-react";
 
 export default function SettingsPage() {
-  const [orgName, setOrgName] = useState("Lindfield East P&C")
-  const [orgEmail, setOrgEmail] = useState("info@lepspandc.asn.au")
-  const [domain, setDomain] = useState("lepspandc.asn.au")
-  const [saved, setSaved] = useState(false)
+  const { user } = useAuth();
+  const [orgName, setOrgName] = useState("");
+  const [orgEmail, setOrgEmail] = useState("");
+  const [domain, setDomain] = useState("");
+  const [primaryColor, setPrimaryColor] = useState("#1b5e41");
+  const [accentColor, setAccentColor] = useState("#ffc107");
+  const [secondaryColor, setSecondaryColor] = useState("#813920");
+  const [saved, setSaved] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
-  const handleSave = () => {
-    setSaved(true)
-    setTimeout(() => setSaved(false), 2000)
+  useEffect(() => {
+    if (!user?.orgId) return;
+    setLoading(true);
+    fetch(`/api/org?orgId=${user.orgId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) return;
+        setOrgName(data.name || "");
+        setOrgEmail(data.email || "");
+        setDomain(data.domain || "");
+        setPrimaryColor(data.primaryColor || "#1b5e41");
+        setAccentColor(data.accentColor || "#ffc107");
+        setSecondaryColor(data.secondaryColor || "#813920");
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [user?.orgId]);
+
+  const handleSave = async () => {
+    if (!user?.orgId) return;
+    setSaving(true);
+    try {
+      await fetch("/api/org", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orgId: user.orgId,
+          name: orgName,
+          email: orgEmail,
+          domain,
+          primaryColor,
+          accentColor,
+          secondaryColor,
+        }),
+      });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch {
+      // silent
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+      </div>
+    );
   }
 
   return (
-    <div className="p-8 max-w-3xl">
+    <div className="max-w-3xl">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="text-sm text-gray-500 mt-1">Configure your organization's profile and branding</p>
+        <h1 className="text-2xl font-serif font-bold text-foreground">
+          Settings
+        </h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          Configure your organization&apos;s profile and branding
+        </p>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl p-6 mb-8">
-        <h3 className="text-lg font-semibold text-gray-900 mb-6">Organization Info</h3>
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-900 mb-2">Organization Name</label>
-            <input
-              type="text"
+      {/* Organization Info */}
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>Organization Info</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="orgName">Organization Name</Label>
+            <Input
+              id="orgName"
               value={orgName}
               onChange={(e) => setOrgName(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
+              placeholder="My Community"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-900 mb-2">Email Address</label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="orgEmail">Email Address</Label>
+            <Input
+              id="orgEmail"
               type="email"
               value={orgEmail}
               onChange={(e) => setOrgEmail(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
+              placeholder="info@community.org"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-900 mb-2">Custom Domain</label>
-            <input
-              type="text"
+          <div className="space-y-2">
+            <Label htmlFor="domain">Custom Domain</Label>
+            <Input
+              id="domain"
               value={domain}
               onChange={(e) => setDomain(e.target.value)}
               placeholder="www.yourorg.com"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
           </div>
-        </div>
+        </CardContent>
+      </Card>
+
+      {/* Brand Colors */}
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>Brand Colors</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label>Primary Color</Label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="color"
+                  value={primaryColor}
+                  onChange={(e) => setPrimaryColor(e.target.value)}
+                  className="w-10 h-10 rounded cursor-pointer border border-border"
+                />
+                <span className="text-sm font-mono text-muted-foreground">
+                  {primaryColor}
+                </span>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Accent Color</Label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="color"
+                  value={accentColor}
+                  onChange={(e) => setAccentColor(e.target.value)}
+                  className="w-10 h-10 rounded cursor-pointer border border-border"
+                />
+                <span className="text-sm font-mono text-muted-foreground">
+                  {accentColor}
+                </span>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Secondary Color</Label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="color"
+                  value={secondaryColor}
+                  onChange={(e) => setSecondaryColor(e.target.value)}
+                  className="w-10 h-10 rounded cursor-pointer border border-border"
+                />
+                <span className="text-sm font-mono text-muted-foreground">
+                  {secondaryColor}
+                </span>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Save */}
+      <div className="flex items-center gap-4">
+        <Button onClick={handleSave} disabled={saving}>
+          <Save size={16} className="mr-2" />
+          {saving ? "Saving..." : "Save Settings"}
+        </Button>
+        {saved && (
+          <span className="text-sm text-emerald-600 dark:text-emerald-400">
+            Settings saved!
+          </span>
+        )}
       </div>
-
-      <div className="bg-white border border-gray-200 rounded-xl p-6 mb-8">
-        <h3 className="text-lg font-semibold text-gray-900 mb-6">Brand Colors</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-900 mb-3">Primary Color</label>
-            <div className="flex items-center gap-3">
-              <input
-                type="color"
-                defaultValue="#15803d"
-                className="w-12 h-12 rounded-lg cursor-pointer border border-gray-300"
-              />
-              <span className="text-sm text-gray-600">#15803d</span>
-            </div>
-            <div className="mt-3 p-4 bg-green-700 rounded-lg text-white text-center text-sm font-medium">
-              Preview
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-900 mb-3">Accent Color</label>
-            <div className="flex items-center gap-3">
-              <input
-                type="color"
-                defaultValue="#f59e0b"
-                className="w-12 h-12 rounded-lg cursor-pointer border border-gray-300"
-              />
-              <span className="text-sm text-gray-600">#f59e0b</span>
-            </div>
-            <div className="mt-3 p-4 bg-amber-400 rounded-lg text-white text-center text-sm font-medium">
-              Preview
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-900 mb-3">Secondary Color</label>
-            <div className="flex items-center gap-3">
-              <input
-                type="color"
-                defaultValue="#6b7280"
-                className="w-12 h-12 rounded-lg cursor-pointer border border-gray-300"
-              />
-              <span className="text-sm text-gray-600">#6b7280</span>
-            </div>
-            <div className="mt-3 p-4 bg-gray-500 rounded-lg text-white text-center text-sm font-medium">
-              Preview
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <button
-        onClick={handleSave}
-        className="w-full bg-green-700 hover:bg-green-800 text-white px-4 py-3 rounded-lg font-medium flex items-center justify-center gap-2 transition"
-      >
-        <Save size={20} />
-        {saved ? "Settings Saved!" : "Save Settings"}
-      </button>
     </div>
-  )
+  );
 }
