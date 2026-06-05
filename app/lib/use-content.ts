@@ -84,7 +84,14 @@ export interface Sponsor {
   createdAt: string;
 }
 
-type ContentTypes = Event | NewsItem | Program | Member | Document | CommitteeMember | Sponsor;
+type ContentTypes =
+  | Event
+  | NewsItem
+  | Program
+  | Member
+  | Document
+  | CommitteeMember
+  | Sponsor;
 
 interface ApiResponse<T> {
   data: T[] | undefined;
@@ -109,7 +116,7 @@ function fetcher(url: string): Promise<any> {
 
 export function useContent<T = ContentTypes>(
   collection: string,
-  orgId?: string
+  orgId?: string,
 ): ApiResponse<T> {
   const params = new URLSearchParams({ collection });
   if (orgId) params.set("orgId", orgId);
@@ -117,11 +124,15 @@ export function useContent<T = ContentTypes>(
   const key = `${API_BASE}?${params.toString()}`;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, isLoading, isValidating, error, mutate } = useSWR<any[]>(key, fetcher, {
-    revalidateOnFocus: false,
-    dedupingInterval: 3000,
-    fallbackData: [],
-  });
+  const { data, isLoading, isValidating, error, mutate } = useSWR<any[]>(
+    key,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 3000,
+      fallbackData: [],
+    },
+  );
 
   const create = async (item: Partial<T>): Promise<string> => {
     const res = await fetch(API_BASE, {
@@ -146,10 +157,9 @@ export function useContent<T = ContentTypes>(
   };
 
   const remove = async (id: string): Promise<void> => {
-    const res = await fetch(
-      `${API_BASE}?collection=${collection}&id=${id}`,
-      { method: "DELETE" }
-    );
+    const res = await fetch(`${API_BASE}?collection=${collection}&id=${id}`, {
+      method: "DELETE",
+    });
     if (!res.ok) throw new Error("Delete failed");
     mutate();
   };

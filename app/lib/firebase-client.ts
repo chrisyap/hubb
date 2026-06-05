@@ -5,15 +5,13 @@ import { initializeApp, getApps } from "firebase/app";
 const isClient = typeof window !== "undefined";
 
 function createClientAuthStub() {
-  return new Proxy(
-    {} as Record<string, unknown>,
-    {
-      get(_, prop) {
-        if (prop === "then") return undefined;
-        return () => Promise.reject(new Error("Firebase Auth not available during SSR"));
-      },
-    }
-  );
+  return new Proxy({} as Record<string, unknown>, {
+    get(_, prop) {
+      if (prop === "then") return undefined;
+      return () =>
+        Promise.reject(new Error("Firebase Auth not available during SSR"));
+    },
+  });
 }
 
 function getFirebaseApp() {
@@ -105,7 +103,8 @@ export function checkMagicLink(): string | null {
 }
 
 export async function completeMagicLink(email: string) {
-  const { isSignInWithEmailLink, signInWithEmailLink } = await import("firebase/auth");
+  const { isSignInWithEmailLink, signInWithEmailLink } =
+    await import("firebase/auth");
   const auth = await getAuth();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   if (!isSignInWithEmailLink(auth as any, window.location.href)) {

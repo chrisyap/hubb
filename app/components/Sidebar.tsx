@@ -1,24 +1,29 @@
-'use client'
+"use client"
 
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { 
-  LayoutDashboard, Calendar, FileText, Grid, Users,
-  FileUp, Settings, Menu, X
-} from 'lucide-react'
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import {
+  LayoutDashboard,
+  Calendar,
+  FileText,
+  Grid,
+  Users,
+  FileUp,
+  Settings,
+} from "lucide-react"
 
 interface SidebarProps {
   isOpen: boolean
 }
 
 const menuItems = [
-  { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/admin/events', label: 'Events', icon: Calendar },
-  { href: '/admin/news', label: 'News & Announcements', icon: FileText },
-  { href: '/admin/programs', label: 'Programs', icon: Grid },
-  { href: '/admin/members', label: 'Members', icon: Users },
-  { href: '/admin/documents', label: 'Documents', icon: FileUp },
-  { href: '/admin/settings', label: 'Settings', icon: Settings },
+  { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/events", label: "Events", icon: Calendar },
+  { href: "/admin/news", label: "News & Announcements", icon: FileText },
+  { href: "/admin/programs", label: "Programs", icon: Grid },
+  { href: "/admin/members", label: "Members", icon: Users },
+  { href: "/admin/documents", label: "Documents", icon: FileUp },
+  { href: "/admin/settings", label: "Settings", icon: Settings },
 ]
 
 export default function Sidebar({ isOpen }: SidebarProps) {
@@ -27,11 +32,11 @@ export default function Sidebar({ isOpen }: SidebarProps) {
   return (
     <div
       className={`${
-        isOpen ? 'w-64' : 'w-0'
-      } bg-slate-900 border-r border-slate-800 transition-all overflow-hidden`}
+        isOpen ? "w-64" : "w-0"
+      } overflow-hidden border-r border-gray-200 bg-white transition-all`}
     >
       <div className="p-6">
-        <h2 className="text-2xl font-serif font-bold text-white mb-8">Hubb</h2>
+        <h2 className="mb-8 font-serif text-2xl font-bold text-gray-900">Hubb</h2>
 
         <nav className="space-y-2">
           {menuItems.map((item) => {
@@ -42,10 +47,10 @@ export default function Sidebar({ isOpen }: SidebarProps) {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${
+                className={`flex items-center gap-3 rounded-lg px-4 py-3 transition ${
                   isActive
-                    ? 'bg-emerald-600 text-white'
-                    : 'text-gray-300 hover:bg-slate-800'
+                    ? "bg-green-100 text-green-700 font-semibold"
+                    : "text-gray-600 hover:bg-gray-100"
                 }`}
               >
                 <Icon size={20} />

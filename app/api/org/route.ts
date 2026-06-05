@@ -33,14 +33,20 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "orgId required" }, { status: 400 });
     }
 
-    await db.collection(ORGS_COLLECTION).doc(orgId).update({
-      ...data,
-      updatedAt: new Date().toISOString(),
-    });
+    await db
+      .collection(ORGS_COLLECTION)
+      .doc(orgId)
+      .update({
+        ...data,
+        updatedAt: new Date().toISOString(),
+      });
 
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Org PUT error:", error);
-    return NextResponse.json({ error: "Failed to update org" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to update org" },
+      { status: 500 },
+    );
   }
 }

@@ -7,7 +7,10 @@ export async function POST(req: NextRequest) {
   try {
     const { uid, email, name } = await req.json();
     if (!uid || !email) {
-      return NextResponse.json({ error: "uid and email required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "uid and email required" },
+        { status: 400 },
+      );
     }
 
     // Find the org (first one — single-tenant white-label)
@@ -21,20 +24,26 @@ export async function POST(req: NextRequest) {
       orgName = orgData.name || orgName;
     }
 
-    await db.collection(USERS_COLLECTION).doc(uid).set({
-      uid,
-      email,
-      name: name || email.split("@")[0],
-      role: "member",
-      orgId,
-      orgName,
-      joinedAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    });
+    await db
+      .collection(USERS_COLLECTION)
+      .doc(uid)
+      .set({
+        uid,
+        email,
+        name: name || email.split("@")[0],
+        role: "member",
+        orgId,
+        orgName,
+        joinedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
 
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Create user error:", error);
-    return NextResponse.json({ error: "Failed to create user" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to create user" },
+      { status: 500 },
+    );
   }
 }

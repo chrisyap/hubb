@@ -25,7 +25,10 @@ export async function GET(req: NextRequest) {
     const orgId = req.nextUrl.searchParams.get("orgId");
 
     if (!collection || !VALID_COLLECTIONS.has(collection)) {
-      return NextResponse.json({ error: "Invalid collection" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid collection" },
+        { status: 400 },
+      );
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -60,7 +63,10 @@ export async function POST(req: NextRequest) {
     const { collection, ...data } = body;
 
     if (!collection || !VALID_COLLECTIONS.has(collection)) {
-      return NextResponse.json({ error: "Invalid collection" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid collection" },
+        { status: 400 },
+      );
     }
 
     const docRef = db.collection(collection).doc();
@@ -86,14 +92,17 @@ export async function PUT(req: NextRequest) {
     if (!collection || !VALID_COLLECTIONS.has(collection) || !id) {
       return NextResponse.json(
         { error: "collection and id required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    await db.collection(collection).doc(id).update({
-      ...data,
-      updatedAt: new Date().toISOString(),
-    });
+    await db
+      .collection(collection)
+      .doc(id)
+      .update({
+        ...data,
+        updatedAt: new Date().toISOString(),
+      });
 
     return NextResponse.json({ success: true });
   } catch (error) {
@@ -110,7 +119,7 @@ export async function DELETE(req: NextRequest) {
     if (!collection || !VALID_COLLECTIONS.has(collection) || !id) {
       return NextResponse.json(
         { error: "collection and id required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 

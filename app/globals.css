@@ -1,7 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap");
-@import "tailwindcss/preflight";
-@import "tailwindcss/utilities";
-@import "tailwindcss/theme";
+@import "tailwindcss";
 
 @source "./";
 @source "./components/";
@@ -45,8 +43,6 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
 }
 
@@ -63,9 +59,18 @@ html.dark body {
   background-color: var(--color-slate-950);
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: "Fraunces", serif;
-  font-weight: 700;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-fraunces);
+  letter-spacing: -0.02em;
+  font-variation-settings:
+    "opsz" 40,
+    "WONK" 1,
+    "SOFT" 0;
 }
 
 a {

@@ -1,43 +1,34 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "../auth-context";
-import { Mail, Lock, LogIn, Globe } from "lucide-react";
-
-import { Button } from "@/app/components/ui/button";
-import { Input } from "@/app/components/ui/input";
-import { Label } from "@/app/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/app/components/ui/card";
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { useAuth } from "../auth-context"
+import { Mail, Lock, LogIn, Globe, Moon, Sun } from "lucide-react"
+import { useTheme } from "../providers"
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [mode, setMode] = useState<"login" | "signup" | "magic">("login");
-  const [error, setError] = useState("");
-  const [magicSent, setMagicSent] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [name, setName] = useState("")
+  const [mode, setMode] = useState<"login" | "signup" | "magic">("login")
+  const [error, setError] = useState("")
+  const [magicSent, setMagicSent] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
   const {
     loginWithGoogle,
     loginWithEmail,
     signUp,
     sendMagicLink,
-  } = useAuth();
+  } = useAuth()
+  const { isDark, toggleDark } = useTheme()
 
   const handleGoogleLogin = async () => {
-    setError("");
-    setIsLoading(true);
+    setError("")
+    setIsLoading(true)
     try {
-      await loginWithGoogle();
-      router.push("/admin/dashboard");
+      await loginWithGoogle()
+      router.push("/admin/dashboard")
     } catch (err: unknown) {
       const e = err as { code?: string; message?: string };
       if (e?.code === "auth/popup-closed-by-user") {
@@ -96,31 +87,44 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center pb-2">
-          <CardTitle className="text-4xl font-serif">Hubb</CardTitle>
-          <CardDescription>Community Management Platform</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
+    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
+      <div className="w-full max-w-md">
+        <div className="rounded-xl border border-gray-200 bg-white p-8">
+          {/* Theme Toggle */}
+          <div className="mb-4 flex justify-end">
+            <button
+              onClick={toggleDark}
+              className="rounded-lg p-2 transition hover:bg-gray-100 text-gray-400"
+              title={isDark ? "Light mode" : "Dark mode"}
+            >
+              {isDark ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
+          </div>
+          {/* Header */}
+          <div className="mb-8 text-center">
+            <h1 className="mb-2 text-3xl font-bold text-gray-900">Hubb</h1>
+            <p className="text-sm text-gray-600">
+              Community Management Platform
+            </p>
+          </div>
+
           {/* Google Sign-In */}
-          <Button
-            variant="outline"
+          <button
             onClick={handleGoogleLogin}
             disabled={isLoading}
-            className="w-full"
-            size="lg"
+            className="mb-6 flex w-full items-center justify-center gap-2 rounded-lg bg-gray-100 px-4 py-2.5 font-medium text-gray-900 transition hover:bg-gray-200"
           >
-            <Globe size={18} className="mr-2" />
+            <Globe size={18} />
             Continue with Google
-          </Button>
+          </button>
 
-          <div className="relative">
+          {/* Divider */}
+          <div className="relative mb-6">
             <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-border" />
+              <span className="w-full border-t border-gray-200" />
             </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">
+            <div className="relative flex justify-center text-xs">
+              <span className="bg-white px-2 text-gray-500">
                 Or {mode === "signup" ? "sign up" : "sign in"} with email
               </span>
             </div>
@@ -128,156 +132,174 @@ export default function LoginPage() {
 
           {/* Email/Password Form */}
           {mode !== "magic" && (
-            <form onSubmit={handleEmailSubmit} className="space-y-3">
+            <form onSubmit={handleEmailSubmit}>
               {mode === "signup" && (
-                <div className="space-y-2">
-                  <Label htmlFor="name">Name</Label>
-                  <Input
-                    id="name"
+                <div style={{ marginBottom: "1rem" }}>
+                  <label className="mb-2 block text-sm font-medium text-gray-900">
+                    Name
+                  </label>
+                  <input
+                    type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Your name"
                     required
+                    className="w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-green-500 focus:outline-none"
                   />
                 </div>
               )}
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+              <div style={{ marginBottom: "1rem" }}>
+                <label className="mb-2 block text-sm font-medium text-gray-900">
+                  Email
+                </label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input
-                    id="email"
+                  <Mail className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10"
                     placeholder="your@email.com"
                     required
+                    className="w-full rounded-lg border border-gray-300 px-4 py-2 pl-10 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-green-500 focus:outline-none"
                   />
                 </div>
               </div>
 
-              {mode === "login" && (
-                <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
+              {(mode === "login" || mode === "signup") && (
+                <div style={{ marginBottom: "1rem" }}>
+                  <label className="mb-2 block text-sm font-medium text-gray-900">
+                    Password
+                  </label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      id="password"
+                    <Lock className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                    <input
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="pl-10"
-                      placeholder="••••••••"
+                      placeholder={
+                        mode === "signup" ? "At least 6 characters" : "••••••••"
+                      }
                       required
-                    />
-                  </div>
-                </div>
-              )}
-
-              {mode === "signup" && (
-                <div className="space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      id="signup-password"
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="pl-10"
-                      placeholder="At least 6 characters"
-                      required
-                      minLength={6}
+                      minLength={mode === "signup" ? 6 : 1}
+                      className="w-full rounded-lg border border-gray-300 px-4 py-2 pl-10 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-green-500 focus:outline-none"
                     />
                   </div>
                 </div>
               )}
 
               {error && (
-                <p className="text-sm text-destructive">{error}</p>
+                <p
+                  style={{ marginBottom: "1rem" }}
+                  className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600"
+                >
+                  {error}
+                </p>
               )}
 
-              <Button
+              <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full"
-                size="lg"
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-700 px-4 py-2.5 font-medium text-white transition hover:bg-green-800 disabled:opacity-50"
               >
-                <LogIn size={18} className="mr-2" />
+                <LogIn size={18} />
                 {isLoading
                   ? "Please wait..."
                   : mode === "signup"
-                  ? "Create Account"
-                  : "Sign In"}
-              </Button>
+                    ? "Create Account"
+                    : "Sign In"}
+              </button>
             </form>
           )}
 
           {/* Magic Link Form */}
           {mode === "magic" && (
-            <form onSubmit={handleMagicLink} className="space-y-3">
-              <div className="space-y-2">
-                <Label htmlFor="magic-email">Email</Label>
-                <Input
-                  id="magic-email"
+            <form onSubmit={handleMagicLink}>
+              <div style={{ marginBottom: "1rem" }}>
+                <label className="mb-2 block text-sm font-medium text-gray-900">
+                  Email
+                </label>
+                <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="your@email.com"
                   required
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-green-500 focus:outline-none"
                 />
               </div>
-              {error && <p className="text-sm text-destructive">{error}</p>}
+              {error && (
+                <p
+                  style={{ marginBottom: "1rem" }}
+                  className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600"
+                >
+                  {error}
+                </p>
+              )}
               {magicSent ? (
-                <p className="text-sm text-emerald-600 dark:text-emerald-400 text-center">
+                <p className="text-center text-sm text-emerald-600">
                   Check your email for the sign-in link!
                 </p>
               ) : (
-                <Button type="submit" disabled={isLoading} className="w-full" size="lg">
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-700 px-4 py-2.5 font-medium text-white transition hover:bg-green-800 disabled:opacity-50"
+                >
                   Send Magic Link
-                </Button>
+                </button>
               )}
             </form>
           )}
 
           {/* Mode switcher */}
-          <div className="flex flex-col items-center gap-2 text-sm text-muted-foreground">
+          <div className="mt-6 flex flex-col items-center gap-2 text-center text-sm text-gray-600">
             {mode === "login" && (
               <>
                 <button
                   onClick={() => setMode("signup")}
-                  className="hover:text-foreground transition"
+                  className="w-full transition hover:text-gray-900"
                 >
-                  No account? <span className="underline">Create one</span>
+                  No account?{" "}
+                  <span className="font-medium text-green-700 underline">
+                    Create one
+                  </span>
                 </button>
                 <button
                   onClick={() => setMode("magic")}
-                  className="hover:text-foreground transition"
+                  className="w-full transition hover:text-gray-900"
                 >
-                  Or sign in with a <span className="underline">magic link</span>
+                  Or sign in with a{" "}
+                  <span className="font-medium text-green-700 underline">
+                    magic link
+                  </span>
                 </button>
               </>
             )}
             {mode === "signup" && (
               <button
                 onClick={() => setMode("login")}
-                className="hover:text-foreground transition"
+                className="w-full transition hover:text-gray-900"
               >
-                Already have an account? <span className="underline">Sign in</span>
+                Already have an account?{" "}
+                <span className="font-medium text-green-700 underline">
+                  Sign in
+                </span>
               </button>
             )}
             {mode === "magic" && (
               <button
                 onClick={() => setMode("login")}
-                className="hover:text-foreground transition"
+                className="w-full transition hover:text-gray-900"
               >
-                Back to <span className="underline">password sign-in</span>
+                Back to{" "}
+                <span className="font-medium text-green-700 underline">
+                  password sign-in
+                </span>
               </button>
             )}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

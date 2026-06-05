@@ -1,92 +1,97 @@
-"use client"
+"use client";
 
-import { Plus } from "lucide-react"
-import { useAuth } from "@/app/auth-context"
-import { useContent, type Program } from "@/app/lib/use-content"
-import { Card } from "@/app/components/ui/card"
-import { Badge } from "@/app/components/ui/badge"
-import { Button } from "@/app/components/ui/button"
+import { LoaderCircle, Plus } from "lucide-react";
+
+import { useAuth } from "@/app/auth-context";
+import { useContent } from "@/app/lib/use-content";
+import type { Program } from "@/app/lib/use-content";
 
 export default function ProgramsPage() {
-  const { user } = useAuth()
-  const orgId = user?.orgId ?? ""
+  const { user } = useAuth();
+  const orgId = user?.orgId ?? "";
 
-  const { data: programs, isLoading } = useContent<Program>("programs", orgId)
+  const { data: programs, isLoading } = useContent<Program>("programs", orgId);
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-24">
         <div className="flex flex-col items-center gap-3">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-green-600 border-t-transparent dark:border-green-500 dark:border-t-transparent" />
-          <p className="text-sm text-gray-500 dark:text-gray-400">Loading programs...</p>
+          <LoaderCircle size={48} className="animate-spin text-green-600" />
+          <p className="text-sm text-gray-500">Loading programs...</p>
         </div>
       </div>
-    )
+    );
   }
 
-  const newProgramButton = (
-    <Button className="bg-green-700 hover:bg-green-800 text-white">
-      <Plus size={18} />
-      New Program
-    </Button>
-  )
-
   return (
-    <>
-      <div className="flex justify-between items-center mb-8">
+    <div className="">
+      <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Programs</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <h1 className="text-2xl font-bold text-gray-900">Programs</h1>
+          <p className="mt-1 text-sm text-gray-500">
             Manage community programs and activities
           </p>
         </div>
-        {newProgramButton}
+        <button className="flex items-center gap-2 rounded-lg bg-green-700 px-4 py-2 font-medium text-white transition hover:bg-green-800">
+          <Plus size={18} />
+          New Program
+        </button>
       </div>
 
       {!programs || programs.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-center">
-          <p className="text-lg font-medium text-gray-500 dark:text-gray-400">
-            No programs yet
-          </p>
-          <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
+          <p className="text-lg font-medium text-gray-500">No programs yet</p>
+          <p className="mt-1 text-sm text-gray-400">
             Create your first program to get started.
           </p>
-          <div className="mt-6">{newProgramButton}</div>
+          <button className="mx-auto mt-6 flex items-center gap-2 rounded-lg bg-green-700 px-4 py-2 font-medium text-white transition hover:bg-green-800">
+            <Plus size={18} />
+            New Program
+          </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           {programs.map((program) => (
-            <Card key={program.id} className="p-6">
-              <div className="flex items-start gap-4 mb-3">
+            <div
+              key={program.id}
+              className="rounded-xl border border-gray-200 bg-white p-6 transition hover:border-gray-300"
+            >
+              <div className="mb-3 flex items-start gap-4">
                 <span className="text-4xl">{program.icon ?? "📋"}</span>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-3 mb-1">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 truncate">
+                <div className="min-w-0 flex-1">
+                  <div className="mb-1 flex items-center gap-3">
+                    <h3 className="truncate text-lg font-semibold text-gray-900">
                       {program.name}
                     </h3>
-                    <Badge variant={program.published ? "success" : "warning"}>
+                    <span
+                      className={`inline-block rounded px-3 py-1 text-xs font-medium ${
+                        program.published
+                          ? "bg-green-100 text-green-700"
+                          : "bg-yellow-100 text-yellow-700"
+                      }`}
+                    >
                       {program.published ? "Published" : "Draft"}
-                    </Badge>
+                    </span>
                   </div>
                   {program.description && (
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
+                    <p className="mt-1 line-clamp-2 text-sm text-gray-600">
                       {program.description}
                     </p>
                   )}
                 </div>
               </div>
-              <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-800">
-                <span className="text-xs text-gray-400 dark:text-gray-500">
+              <div className="flex items-center justify-between border-t border-gray-100 pt-3">
+                <span className="text-xs text-gray-500">
                   {new Date(program.createdAt).toLocaleDateString()}
                 </span>
-                <Button variant="outline" size="sm">
+                <button className="rounded bg-gray-100 px-3 py-1 text-sm font-medium text-gray-900 transition hover:bg-gray-200">
                   Edit
-                </Button>
+                </button>
               </div>
-            </Card>
+            </div>
           ))}
         </div>
       )}
-    </>
-  )
+    </div>
+  );
 }

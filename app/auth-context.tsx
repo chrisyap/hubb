@@ -56,7 +56,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 function parseUser(
   fbUser: FirebaseUser,
-  profile?: Partial<UserProfile>
+  profile?: Partial<UserProfile>,
 ): UserProfile {
   return {
     uid: fbUser.uid,
@@ -75,7 +75,7 @@ function parseUser(
 }
 
 async function fetchUserProfile(
-  uid: string
+  uid: string,
 ): Promise<Partial<UserProfile> | null> {
   try {
     const res = await fetch(`/api/users/${uid}`);
@@ -105,7 +105,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let unsubscribe: (() => void) | null = null;
 
     async function init() {
-      const auth = (await getAuth()) as ReturnType<typeof onAuthStateChanged> extends (auth: infer A) => unknown ? A : never;
+      const auth = (await getAuth()) as ReturnType<
+        typeof onAuthStateChanged
+      > extends (auth: infer A) => unknown
+        ? A
+        : never;
 
       // Hmm, getAuth returns a stub or real auth. Let me just import firebase/auth dynamically.
       try {
@@ -119,17 +123,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return;
         }
 
-        const app =
-          getApps().length
-            ? getApps()[0]
-            : initializeApp({
-                apiKey,
-                authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-                projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-                storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-                messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-                appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-              });
+        const app = getApps().length
+          ? getApps()[0]
+          : initializeApp({
+              apiKey,
+              authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+              projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+              storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+              messagingSenderId:
+                process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+              appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+            });
 
         const firebaseAuth = getFirebaseAuth(app);
 
@@ -183,17 +187,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const loginWithGoogle = async () => {
-    const { signInWithPopup, GoogleAuthProvider } = await import("firebase/auth");
+    const { signInWithPopup, GoogleAuthProvider } =
+      await import("firebase/auth");
     const { initializeApp, getApps } = await import("firebase/app");
 
-    const app =
-      getApps().length
-        ? getApps()[0]
-        : initializeApp({
-            apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-            authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-            projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-          });
+    const app = getApps().length
+      ? getApps()[0]
+      : initializeApp({
+          apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+          authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+          projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+        });
 
     const auth = await (await import("firebase/auth")).getAuth(app);
     const provider = new GoogleAuthProvider();
@@ -202,17 +206,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const loginWithEmail = async (email: string, password: string) => {
-    const { signInWithEmailAndPassword, getAuth } = await import("firebase/auth");
+    const { signInWithEmailAndPassword, getAuth } =
+      await import("firebase/auth");
     const { initializeApp, getApps } = await import("firebase/app");
 
-    const app =
-      getApps().length
-        ? getApps()[0]
-        : initializeApp({
-            apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-            authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-            projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-          });
+    const app = getApps().length
+      ? getApps()[0]
+      : initializeApp({
+          apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+          authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+          projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+        });
 
     const auth = getAuth(app);
     await signInWithEmailAndPassword(auth, email, password);
@@ -221,19 +225,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const handleSignUp = async (
     email: string,
     password: string,
-    name: string
+    name: string,
   ) => {
-    const { createUserWithEmailAndPassword, getAuth } = await import("firebase/auth");
+    const { createUserWithEmailAndPassword, getAuth } =
+      await import("firebase/auth");
     const { initializeApp, getApps } = await import("firebase/app");
 
-    const app =
-      getApps().length
-        ? getApps()[0]
-        : initializeApp({
-            apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-            authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-            projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-          });
+    const app = getApps().length
+      ? getApps()[0]
+      : initializeApp({
+          apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+          authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+          projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+        });
 
     const auth = getAuth(app);
     const result = await createUserWithEmailAndPassword(auth, email, password);
@@ -254,14 +258,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { sendSignInLinkToEmail, getAuth } = await import("firebase/auth");
     const { initializeApp, getApps } = await import("firebase/app");
 
-    const app =
-      getApps().length
-        ? getApps()[0]
-        : initializeApp({
-            apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-            authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-            projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-          });
+    const app = getApps().length
+      ? getApps()[0]
+      : initializeApp({
+          apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+          authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+          projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+        });
 
     const auth = getAuth(app);
     await sendSignInLinkToEmail(auth, email, {
@@ -272,17 +275,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const handleCompleteMagicLink = async () => {
-    const { isSignInWithEmailLink, signInWithEmailLink, getAuth } = await import("firebase/auth");
+    const { isSignInWithEmailLink, signInWithEmailLink, getAuth } =
+      await import("firebase/auth");
     const { initializeApp, getApps } = await import("firebase/app");
 
-    const app =
-      getApps().length
-        ? getApps()[0]
-        : initializeApp({
-            apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-            authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-            projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-          });
+    const app = getApps().length
+      ? getApps()[0]
+      : initializeApp({
+          apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+          authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+          projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+        });
 
     const auth = getAuth(app);
     if (!isSignInWithEmailLink(auth, window.location.href)) {
@@ -298,12 +301,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { signOut, getAuth } = await import("firebase/auth");
     const { initializeApp, getApps } = await import("firebase/app");
 
-    const app =
-      getApps().length
-        ? getApps()[0]
-        : initializeApp({
-            apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-          });
+    const app = getApps().length
+      ? getApps()[0]
+      : initializeApp({
+          apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+        });
 
     const auth = getAuth(app);
     await signOut(auth);
@@ -344,10 +346,9 @@ async function getFirebaseUser(): Promise<FirebaseUser | null> {
     const { getAuth, onAuthStateChanged } = await import("firebase/auth");
     const { initializeApp, getApps } = await import("firebase/app");
 
-    const app =
-      getApps().length
-        ? getApps()[0]
-        : initializeApp({ apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY });
+    const app = getApps().length
+      ? getApps()[0]
+      : initializeApp({ apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY });
 
     const auth = getAuth(app);
     return new Promise((resolve) => {

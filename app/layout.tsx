@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
+import { fraunces } from "@/fonts/fraunces";
+
 import { AuthProvider } from "./auth-context";
 import { ThemeProvider } from "./providers";
 
@@ -16,7 +18,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>
+      <body className={fraunces.variable}>
         <ThemeProvider>
           <AuthProvider>{children}</AuthProvider>
         </ThemeProvider>

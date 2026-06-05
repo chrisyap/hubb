@@ -1,7 +1,15 @@
 "use client";
 
+import {
+  Calendar,
+  FileText,
+  Loader2,
+  LoaderCircle,
+  TrendingUp,
+  Users,
+} from "lucide-react";
+
 import { useAuth } from "@/app/auth-context";
-import { useContent, type Event, type Member } from "@/app/lib/use-content";
 import { Button } from "@/app/components/ui/button";
 import {
   Card,
@@ -9,23 +17,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/app/components/ui/card";
-import {
-  Users,
-  Calendar,
-  TrendingUp,
-  FileText,
-  Loader2,
-} from "lucide-react";
+import { useContent } from "@/app/lib/use-content";
+import type { Event, Member } from "@/app/lib/use-content";
 
 export default function Dashboard() {
   const { user } = useAuth();
   const { data: events, isLoading: eventsLoading } = useContent<Event>(
     "events",
-    user?.orgId
+    user?.orgId,
   );
   const { data: members, isLoading: membersLoading } = useContent<Member>(
     "members",
-    user?.orgId
+    user?.orgId,
   );
 
   const loading = eventsLoading || membersLoading;
@@ -36,10 +39,8 @@ export default function Dashboard() {
   const upcomingEvents = publishedEvents
     .filter((e) => new Date(e.date) >= new Date())
     .slice(0, 3);
-  const activeMembers =
-    members?.filter((m) => m.status === "active") || [];
-  const pendingMembers =
-    members?.filter((m) => m.status === "pending") || [];
+  const activeMembers = members?.filter((m) => m.status === "active") || [];
+  const pendingMembers = members?.filter((m) => m.status === "pending") || [];
 
   const stats = [
     {
@@ -51,13 +52,17 @@ export default function Dashboard() {
     {
       label: "Upcoming Events",
       value: upcomingEvents.length.toString(),
-      change: "Next: " + (upcomingEvents[0]?.date ? new Date(upcomingEvents[0].date).toLocaleDateString() : "None"),
+      change:
+        "Next: " +
+        (upcomingEvents[0]?.date
+          ? new Date(upcomingEvents[0].date).toLocaleDateString()
+          : "None"),
       icon: Calendar,
     },
     {
       label: "Total Events",
       value: publishedEvents.length.toString(),
-      change: `${events?.filter(e => !e.published).length || 0} drafts`,
+      change: `${events?.filter((e) => !e.published).length || 0} drafts`,
       icon: TrendingUp,
     },
     {
@@ -71,7 +76,7 @@ export default function Dashboard() {
   const recentActivity = (events || [])
     .sort(
       (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     )
     .slice(0, 4)
     .map((e) => ({
@@ -92,175 +97,174 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+      <div className="flex items-center justify-center py-24">
+        <div className="flex flex-col items-center gap-3">
+          <LoaderCircle size={48} className="animate-spin text-green-600" />
+          <p className="text-sm text-gray-500">Loading dashboard...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <>
+    <div className="">
       {/* Header */}
-      <div className="bg-linear-to-r from-emerald-700 to-emerald-500 text-white px-8 py-12 -mx-8 -mt-6 mb-8">
-        <h1 className="text-4xl font-serif font-bold mb-2">Dashboard</h1>
-        <p className="text-emerald-50">
-          Welcome back{user?.name ? `, ${user.name}` : ""}. Here&apos;s
-          your community at a glance.
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <p className="mt-1 text-sm text-gray-500">
+          Welcome back{user?.name ? `, ${user.name}` : ""}. Here&apos;s your
+          community at a glance.
         </p>
       </div>
 
       {/* Stats grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="mb-8 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat, i) => {
           const Icon = stat.icon;
           return (
-            <Card key={i}>
-              <CardHeader className="pb-2 flex flex-row items-center justify-between">
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                  {stat.label}
-                </p>
-                <Icon className="w-5 h-5 text-muted-foreground/50" />
-              </CardHeader>
-              <CardContent>
-                <p className="text-4xl font-bold mb-1">{stat.value}</p>
-                <p className="text-sm text-emerald-600 dark:text-emerald-400">
-                  {stat.change}
-                </p>
-              </CardContent>
-            </Card>
+            <div
+              key={i}
+              className="rounded-xl border border-gray-200 bg-white p-6 transition hover:border-gray-300"
+            >
+              <p className="mb-3 text-xs font-semibold tracking-wider text-gray-500 uppercase">
+                {stat.label}
+              </p>
+              <p className="mb-2 text-3xl font-bold text-gray-900">
+                {stat.value}
+              </p>
+              <p className="text-sm font-medium text-green-600">
+                {stat.change}
+              </p>
+            </div>
           );
         })}
       </div>
 
       {/* Charts & Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Recent activity</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {recentActivity.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                No activity yet. Create your first event to get started.
-              </p>
-            ) : (
-              <div className="space-y-4">
-                {recentActivity.map((item, i) => (
-                  <div
-                    key={i}
-                    className={
-                      i < recentActivity.length - 1
-                        ? "pb-4 border-b border-border"
-                        : ""
-                    }
-                  >
-                    <div className="flex gap-3">
-                      <div className="w-2 h-2 rounded-full mt-2 shrink-0 bg-emerald-600" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm">{item.text}</p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {item.time}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Upcoming events</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {upcomingEvents.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                No upcoming events
-              </p>
-            ) : (
-              <div className="space-y-4">
-                {upcomingEvents.map((event, i) => (
-                  <div
-                    key={i}
-                    className={
-                      i < upcomingEvents.length - 1
-                        ? "pb-4 border-b border-border"
-                        : ""
-                    }
-                  >
-                    <p className="font-semibold text-sm">{event.title}</p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {new Date(event.date).toLocaleDateString()}
-                      {event.attendees !== undefined
-                        ? ` · ${event.attendees} RSVPs`
-                        : ""}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* To-do list */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>To-do list</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {todos.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              Nothing to do — you&apos;re all caught up!
+      <div className="mb-8 grid grid-cols-1 gap-5 lg:grid-cols-3">
+        <div className="rounded-xl border border-gray-200 bg-white p-6 lg:col-span-2">
+          <h3 className="mb-6 text-base font-semibold text-gray-900">
+            Recent Activity
+          </h3>
+          {recentActivity.length === 0 ? (
+            <p className="text-muted-foreground text-sm">
+              No activity yet. Create your first event to get started.
             </p>
           ) : (
-            <div className="space-y-3">
-              {todos.map((todo, i) => (
-                <label
+            <div className="space-y-4">
+              {recentActivity.map((item, i) => (
+                <div
                   key={i}
-                  className="flex items-center gap-3 cursor-pointer"
+                  className={
+                    i < recentActivity.length - 1
+                      ? "border-border border-b pb-4"
+                      : ""
+                  }
                 >
-                  <input type="checkbox" className="w-4 h-4" />
-                  <span className="text-sm">{todo}</span>
-                </label>
+                  <div className="flex gap-3">
+                    <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-green-700" />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-gray-900">
+                        {item.text}
+                      </p>
+                      <p className="mt-1 text-xs text-gray-500">{item.time}</p>
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+
+        <div className="rounded-xl border border-gray-200 bg-white p-6">
+          <h3 className="mb-6 text-base font-semibold text-gray-900">
+            Upcoming Events
+          </h3>
+          {upcomingEvents.length === 0 ? (
+            <p className="text-sm text-gray-500">No upcoming events</p>
+          ) : (
+            <div className="space-y-4">
+              {upcomingEvents.map((event, i) => (
+                <div
+                  key={i}
+                  className={
+                    i < upcomingEvents.length - 1
+                      ? "border-b border-gray-100 pb-4"
+                      : ""
+                  }
+                >
+                  <p className="text-sm font-semibold text-gray-900">
+                    {event.title}
+                  </p>
+                  <p className="mt-1 text-xs text-gray-500">
+                    {new Date(event.date).toLocaleDateString()}
+                    {event.attendees !== undefined
+                      ? ` · ${event.attendees} RSVPs`
+                      : ""}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* To-do list */}
+      <div className="mb-8 rounded-xl border border-gray-200 bg-white p-6">
+        <h3 className="mb-6 text-base font-semibold text-gray-900">
+          To-Do List
+        </h3>
+        {todos.length === 0 ? (
+          <p className="text-sm text-gray-500">
+            Nothing to do — you&apos;re all caught up!
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {todos.map((todo, i) => (
+              <label key={i} className="flex cursor-pointer items-center gap-3">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 rounded border-gray-300"
+                />
+                <span className="text-sm text-gray-900">{todo}</span>
+              </label>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Quick actions</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <Button
-              onClick={() => (window.location.href = "/admin/events")}
-            >
-              + Create event
-            </Button>
-            <Button
-              onClick={() => (window.location.href = "/admin/news")}
-            >
-              + New announcement
-            </Button>
-            <Button
-              onClick={() => (window.location.href = "/admin/documents")}
-            >
-              + Upload document
-            </Button>
-            <Button
-              onClick={() => (window.location.href = "/admin/members")}
-            >
-              + Manage members
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </>
+      <div className="rounded-xl border border-gray-200 bg-white p-6">
+        <h3 className="mb-6 text-base font-semibold text-gray-900">
+          Quick Actions
+        </h3>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <button
+            onClick={() => (window.location.href = "/admin/events")}
+            className="rounded-lg bg-green-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-800"
+          >
+            + Create Event
+          </button>
+          <button
+            onClick={() => (window.location.href = "/admin/news")}
+            className="rounded-lg bg-green-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-800"
+          >
+            + Announcement
+          </button>
+          <button
+            onClick={() => (window.location.href = "/admin/documents")}
+            className="rounded-lg bg-green-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-800"
+          >
+            + Upload Doc
+          </button>
+          <button
+            onClick={() => (window.location.href = "/admin/members")}
+            className="rounded-lg bg-green-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-800"
+          >
+            + Add Member
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

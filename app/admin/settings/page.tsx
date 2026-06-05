@@ -1,17 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Loader2, LoaderCircle, Save } from "lucide-react";
+import { useEffect, useState } from "react";
+
 import { useAuth } from "@/app/auth-context";
-import { Button } from "@/app/components/ui/button";
-import { Input } from "@/app/components/ui/input";
-import { Label } from "@/app/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/app/components/ui/card";
-import { Save, Loader2 } from "lucide-react";
 
 export default function SettingsPage() {
   const { user } = useAuth();
@@ -71,123 +63,138 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+      <div className="flex items-center justify-center py-24">
+        <div className="flex flex-col items-center gap-3">
+          <LoaderCircle size={48} className="animate-spin text-green-600" />
+          <p className="text-sm text-gray-500">Loading...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-3xl">
+    <div className="">
       <div className="mb-8">
-        <h1 className="text-2xl font-serif font-bold text-foreground">
-          Settings
-        </h1>
-        <p className="text-sm text-muted-foreground mt-1">
+        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
+        <p className="mt-1 text-sm text-gray-500">
           Configure your organization&apos;s profile and branding
         </p>
       </div>
 
       {/* Organization Info */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>Organization Info</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="orgName">Organization Name</Label>
-            <Input
-              id="orgName"
+      <div className="mb-8 rounded-xl border border-gray-200 bg-white p-6">
+        <h3 className="mb-6 text-lg font-semibold text-gray-900">
+          Organization Info
+        </h3>
+        <div className="space-y-4">
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-900">
+              Organization Name
+            </label>
+            <input
+              type="text"
               value={orgName}
               onChange={(e) => setOrgName(e.target.value)}
               placeholder="My Community"
+              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-green-500 focus:outline-none"
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="orgEmail">Email Address</Label>
-            <Input
-              id="orgEmail"
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-900">
+              Email Address
+            </label>
+            <input
               type="email"
               value={orgEmail}
               onChange={(e) => setOrgEmail(e.target.value)}
               placeholder="info@community.org"
+              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-green-500 focus:outline-none"
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="domain">Custom Domain</Label>
-            <Input
-              id="domain"
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-900">
+              Custom Domain
+            </label>
+            <input
+              type="text"
               value={domain}
               onChange={(e) => setDomain(e.target.value)}
               placeholder="www.yourorg.com"
+              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-green-500 focus:outline-none"
             />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Brand Colors */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>Brand Colors</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label>Primary Color</Label>
-              <div className="flex items-center gap-3">
-                <input
-                  type="color"
-                  value={primaryColor}
-                  onChange={(e) => setPrimaryColor(e.target.value)}
-                  className="w-10 h-10 rounded cursor-pointer border border-border"
-                />
-                <span className="text-sm font-mono text-muted-foreground">
-                  {primaryColor}
-                </span>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Accent Color</Label>
-              <div className="flex items-center gap-3">
-                <input
-                  type="color"
-                  value={accentColor}
-                  onChange={(e) => setAccentColor(e.target.value)}
-                  className="w-10 h-10 rounded cursor-pointer border border-border"
-                />
-                <span className="text-sm font-mono text-muted-foreground">
-                  {accentColor}
-                </span>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Secondary Color</Label>
-              <div className="flex items-center gap-3">
-                <input
-                  type="color"
-                  value={secondaryColor}
-                  onChange={(e) => setSecondaryColor(e.target.value)}
-                  className="w-10 h-10 rounded cursor-pointer border border-border"
-                />
-                <span className="text-sm font-mono text-muted-foreground">
-                  {secondaryColor}
-                </span>
-              </div>
+      <div className="mb-8 rounded-xl border border-gray-200 bg-white p-6">
+        <h3 className="mb-6 text-lg font-semibold text-gray-900">
+          Brand Colors
+        </h3>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div>
+            <label className="mb-3 block text-sm font-medium text-gray-900">
+              Primary Color
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={primaryColor}
+                onChange={(e) => setPrimaryColor(e.target.value)}
+                className="h-10 w-10 cursor-pointer rounded border border-gray-300"
+              />
+              <span className="font-mono text-sm text-gray-600">
+                {primaryColor}
+              </span>
             </div>
           </div>
-        </CardContent>
-      </Card>
+          <div>
+            <label className="mb-3 block text-sm font-medium text-gray-900">
+              Accent Color
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={accentColor}
+                onChange={(e) => setAccentColor(e.target.value)}
+                className="h-10 w-10 cursor-pointer rounded border border-gray-300"
+              />
+              <span className="font-mono text-sm text-gray-600">
+                {accentColor}
+              </span>
+            </div>
+          </div>
+          <div>
+            <label className="mb-3 block text-sm font-medium text-gray-900">
+              Secondary Color
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={secondaryColor}
+                onChange={(e) => setSecondaryColor(e.target.value)}
+                className="h-10 w-10 cursor-pointer rounded border border-gray-300"
+              />
+              <span className="font-mono text-sm text-gray-600">
+                {secondaryColor}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Save */}
       <div className="flex items-center gap-4">
-        <Button onClick={handleSave} disabled={saving}>
-          <Save size={16} className="mr-2" />
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="flex items-center gap-2 rounded-lg bg-green-700 px-4 py-2.5 font-medium text-white transition hover:bg-green-800 disabled:opacity-50"
+        >
+          <Save size={16} />
           {saving ? "Saving..." : "Save Settings"}
-        </Button>
+        </button>
         {saved && (
-          <span className="text-sm text-emerald-600 dark:text-emerald-400">
-            Settings saved!
-          </span>
+          <span className="text-sm text-green-700">Settings saved!</span>
         )}
       </div>
     </div>

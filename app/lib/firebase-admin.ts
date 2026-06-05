@@ -13,7 +13,7 @@ function getServiceAccount(): string {
   }
 
   throw new Error(
-    "Missing Firebase credentials. Set FIREBASE_SERVICE_ACCOUNT_JSON or FIREBASE_SERVICE_ACCOUNT_PATH"
+    "Missing Firebase credentials. Set FIREBASE_SERVICE_ACCOUNT_JSON or FIREBASE_SERVICE_ACCOUNT_PATH",
   );
 }
 
@@ -57,11 +57,11 @@ function stubFirestore(): any {
         return () =>
           Promise.reject(
             new Error(
-              "Firebase not configured. Set NEXT_PUBLIC_FIREBASE_* env vars."
-            )
+              "Firebase not configured. Set NEXT_PUBLIC_FIREBASE_* env vars.",
+            ),
           );
       },
-    }
+    },
   );
 }
 
@@ -74,11 +74,11 @@ function stubAuth(): any {
         return () =>
           Promise.reject(
             new Error(
-              "Firebase not configured. Set NEXT_PUBLIC_FIREBASE_* env vars."
-            )
+              "Firebase not configured. Set NEXT_PUBLIC_FIREBASE_* env vars.",
+            ),
           );
       },
-    }
+    },
   );
 }
 

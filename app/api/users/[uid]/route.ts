@@ -5,7 +5,7 @@ const USERS_COLLECTION = "members";
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: Promise<{ uid: string }> }
+  { params }: { params: Promise<{ uid: string }> },
 ) {
   try {
     const { uid } = await params;

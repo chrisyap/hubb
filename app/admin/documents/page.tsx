@@ -1,140 +1,150 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Plus, Eye, Trash2 } from "lucide-react"
-import { useAuth } from "@/app/auth-context"
-import { useContent, type Document } from "@/app/lib/use-content"
-import { Card } from "@/app/components/ui/card"
-import { Badge } from "@/app/components/ui/badge"
-import { Button } from "@/app/components/ui/button"
+import { LoaderCircle, Plus } from "lucide-react";
+import { useState } from "react";
+
+import { useAuth } from "@/app/auth-context";
+import { useContent } from "@/app/lib/use-content";
+import type { Document } from "@/app/lib/use-content";
 
 export default function DocumentsPage() {
-  const { user } = useAuth()
-  const orgId = user?.orgId ?? ""
+  const { user } = useAuth();
+  const orgId = user?.orgId ?? "";
 
-  const { data: documents, isLoading, remove } = useContent<Document>("documents", orgId)
-  const [showUpload, setShowUpload] = useState(false)
+  const {
+    data: documents,
+    isLoading,
+    remove,
+  } = useContent<Document>("documents", orgId);
+  const [showUpload, setShowUpload] = useState(false);
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-24">
         <div className="flex flex-col items-center gap-3">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-green-600 border-t-transparent dark:border-green-500 dark:border-t-transparent" />
-          <p className="text-sm text-gray-500 dark:text-gray-400">Loading documents...</p>
+          <LoaderCircle size={48} className="animate-spin text-green-600" />
+          <p className="text-sm text-gray-500">Loading documents...</p>
         </div>
       </div>
-    )
+    );
   }
 
-  const uploadButton = (
-    <Button
-      onClick={() => setShowUpload(!showUpload)}
-      className="bg-green-700 hover:bg-green-800 text-white"
-    >
-      <Plus size={18} />
-      Upload Document
-    </Button>
-  )
-
   return (
-    <>
-      <div className="flex justify-between items-center mb-8">
+    <div className="">
+      <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Documents</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <h1 className="text-2xl font-bold text-gray-900">Documents</h1>
+          <p className="mt-1 text-sm text-gray-500">
             Upload and manage community documents
           </p>
         </div>
-        {uploadButton}
+        <button
+          onClick={() => setShowUpload(!showUpload)}
+          className="flex items-center gap-2 rounded-lg bg-green-700 px-4 py-2 font-medium text-white transition hover:bg-green-800"
+        >
+          <Plus size={18} />
+          Upload Document
+        </button>
       </div>
 
       {showUpload && (
-        <Card className="p-6 mb-8">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+        <div className="mb-8 rounded-xl border border-gray-200 bg-white p-6">
+          <h3 className="mb-4 text-lg font-semibold text-gray-900">
             Upload Document
           </h3>
           <form className="space-y-4">
-            <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center hover:border-green-400 dark:hover:border-green-500 transition cursor-pointer">
-              <p className="font-medium text-gray-900 dark:text-gray-100">
+            <div className="cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-8 text-center transition hover:border-green-400">
+              <p className="font-medium text-gray-900">
                 Drop files here or click to upload
               </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              <p className="mt-1 text-sm text-gray-500">
                 PDF, DOC, DOCX up to 50MB
               </p>
             </div>
 
             <div>
-              <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-700 dark:text-gray-300">
-                <input type="checkbox" className="w-4 h-4 rounded border-gray-300 dark:border-gray-600" />
+              <label className="flex cursor-pointer items-center gap-2 text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 rounded border-gray-300"
+                />
                 Member-only access
               </label>
             </div>
 
             <div className="flex gap-2">
-              <Button type="submit" className="bg-green-700 hover:bg-green-800 text-white">
+              <button
+                type="submit"
+                className="rounded-lg bg-green-700 px-4 py-2 font-medium text-white transition hover:bg-green-800"
+              >
                 Upload
-              </Button>
-              <Button
+              </button>
+              <button
                 type="button"
-                variant="outline"
                 onClick={() => setShowUpload(false)}
+                className="rounded-lg bg-gray-100 px-4 py-2 font-medium text-gray-900 transition hover:bg-gray-200"
               >
                 Cancel
-              </Button>
+              </button>
             </div>
           </form>
-        </Card>
+        </div>
       )}
 
       {!documents || documents.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-center">
-          <p className="text-lg font-medium text-gray-500 dark:text-gray-400">
-            No documents yet
-          </p>
-          <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
+          <p className="text-lg font-medium text-gray-500">No documents yet</p>
+          <p className="mt-1 text-sm text-gray-400">
             Upload your first document to get started.
           </p>
-          <div className="mt-6">{uploadButton}</div>
+          <button
+            onClick={() => setShowUpload(!showUpload)}
+            className="mx-auto mt-6 flex items-center gap-2 rounded-lg bg-green-700 px-4 py-2 font-medium text-white transition hover:bg-green-800"
+          >
+            <Plus size={18} />
+            Upload Document
+          </button>
         </div>
       ) : (
         <div className="space-y-4">
           {documents.map((doc) => (
-            <Card key={doc.id} className="p-6">
+            <div
+              key={doc.id}
+              className="rounded-xl border border-gray-200 bg-white p-6 transition hover:border-gray-300"
+            >
               <div className="flex items-start justify-between">
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 truncate">
+                <div className="min-w-0 flex-1">
+                  <h3 className="truncate text-base font-semibold text-gray-900">
                     {doc.title}
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  <p className="mt-1 text-sm text-gray-600">
                     {doc.fileSize && `${doc.fileSize} • `}
                     Uploaded {new Date(doc.createdAt).toLocaleDateString()}
                   </p>
                 </div>
-                <div className="flex items-center gap-2 ml-4 flex-shrink-0">
+                <div className="ml-4 flex flex-shrink-0 items-center gap-2">
                   {doc.memberOnly && (
-                    <Badge variant="secondary">Member Only</Badge>
+                    <span className="inline-block rounded bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700">
+                      Member Only
+                    </span>
                   )}
                 </div>
               </div>
-              <div className="mt-4 flex gap-2 pt-4 border-t border-gray-100 dark:border-gray-800">
-                <Button variant="outline" size="sm" className="flex-1">
-                  <Eye className="h-4 w-4" />
+              <div className="mt-4 flex gap-2 border-t border-gray-100 pt-4">
+                <button className="flex-1 rounded-lg bg-gray-100 px-3 py-2 text-sm font-medium text-gray-900 transition hover:bg-gray-200">
                   View
-                </Button>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  className="flex-1"
+                </button>
+                <button
                   onClick={() => remove(doc.id)}
+                  className="flex-1 rounded-lg bg-gray-100 px-3 py-2 text-sm font-medium text-gray-900 transition hover:bg-gray-200"
                 >
-                  <Trash2 className="h-4 w-4" />
                   Delete
-                </Button>
+                </button>
               </div>
-            </Card>
+            </div>
           ))}
         </div>
       )}
-    </>
-  )
+    </div>
+  );
 }
