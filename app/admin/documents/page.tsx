@@ -1,12 +1,21 @@
 "use client";
 
-import { LoaderCircle, Plus } from "lucide-react";
+import { LoaderCircle, Plus, Square, SquareCheck, SquareX } from "lucide-react";
 import { useState } from "react";
 
 import { useAuth } from "@/app/auth-context";
+import { Button } from "@/app/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/app/components/ui/card";
+import { PageTitle } from "@/app/components/ui/pageTitle";
 import { useContent } from "@/app/lib/use-content";
-import type { Document } from "@/app/lib/use-content";
+import { cn } from "@/lib/utils";
 
+import type { Document } from "@/app/lib/use-content";
 export default function DocumentsPage() {
   const { user } = useAuth();
   const orgId = user?.orgId ?? "";
@@ -32,78 +41,74 @@ export default function DocumentsPage() {
   return (
     <div className="">
       <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Documents</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Upload and manage community documents
-          </p>
-        </div>
-        <button
-          onClick={() => setShowUpload(!showUpload)}
-          className="flex items-center gap-2 rounded-lg bg-green-700 px-4 py-2 font-medium text-white transition hover:bg-green-800"
-        >
+        <PageTitle
+          title="Documents"
+          description="Upload and manage community documents"
+        />
+        <Button onClick={() => setShowUpload(!showUpload)}>
           <Plus size={18} />
           Upload Document
-        </button>
+        </Button>
       </div>
 
       {showUpload && (
-        <div className="mb-8 rounded-xl border border-gray-200 bg-white p-6">
-          <h3 className="mb-4 text-lg font-semibold text-gray-900">
-            Upload Document
-          </h3>
-          <form className="space-y-4">
-            <div className="cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-8 text-center transition hover:border-green-400">
-              <p className="font-medium text-gray-900">
-                Drop files here or click to upload
-              </p>
-              <p className="mt-1 text-sm text-gray-500">
-                PDF, DOC, DOCX up to 50MB
-              </p>
-            </div>
-
-            <div>
-              <label className="flex cursor-pointer items-center gap-2 text-sm text-gray-700">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 rounded border-gray-300"
-                />
-                Member-only access
-              </label>
-            </div>
-
-            <div className="flex gap-2">
-              <button
-                type="submit"
-                className="rounded-lg bg-green-700 px-4 py-2 font-medium text-white transition hover:bg-green-800"
+        <Card>
+          <CardHeader>
+            <CardTitle>Upload Document</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form className="space-y-4">
+              <div
+                className={cn(
+                  "cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-8 text-center transition hover:border-green-700 dark:border-gray-600",
+                  "dark:border-gray-600 dark:hover:border-green-400",
+                )}
               >
-                Upload
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowUpload(false)}
-                className="rounded-lg bg-gray-100 px-4 py-2 font-medium text-gray-900 transition hover:bg-gray-200"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
+                <p className="font-medium text-gray-900 dark:text-gray-100">
+                  Drop files here or click to upload
+                </p>
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  PDF, DOC, DOCX up to 50MB
+                </p>
+              </div>
+
+              <div>
+                <label className="flex cursor-pointer items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                  <input type="checkbox" className="hidden h-4 w-4" />
+                  <SquareX
+                    size={20}
+                    className="text-slate-400 dark:text-slate-500"
+                  />
+                  Member-only access
+                </label>
+              </div>
+
+              <div className="flex gap-2">
+                <Button type="submit">Upload</Button>
+                <Button type="button" onClick={() => setShowUpload(false)}>
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
       )}
 
       {!documents || documents.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-center">
-          <p className="text-lg font-medium text-gray-500">No documents yet</p>
+          <p className="text-lg font-medium text-gray-500 dark:text-gray-400">
+            No documents yet
+          </p>
           <p className="mt-1 text-sm text-gray-400">
             Upload your first document to get started.
           </p>
-          <button
+          <Button
             onClick={() => setShowUpload(!showUpload)}
-            className="mx-auto mt-6 flex items-center gap-2 rounded-lg bg-green-700 px-4 py-2 font-medium text-white transition hover:bg-green-800"
+            className="mx-auto mt-6"
           >
             <Plus size={18} />
             Upload Document
-          </button>
+          </Button>
         </div>
       ) : (
         <div className="space-y-4">

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
+import { dmSans } from "@/fonts/dmSans";
 import { fraunces } from "@/fonts/fraunces";
 
 import { AuthProvider } from "./auth-context";
@@ -18,7 +19,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={fraunces.variable}>
+      <body
+        className={fraunces.variable + " " + dmSans.variable + " font-sans"}
+      >
         <ThemeProvider>
           <AuthProvider>{children}</AuthProvider>
         </ThemeProvider>

@@ -3,9 +3,11 @@
 import { LoaderCircle, Plus } from "lucide-react";
 
 import { useAuth } from "@/app/auth-context";
+import { Button } from "@/app/components/ui/button";
+import { PageTitle } from "@/app/components/ui/pageTitle";
 import { useContent } from "@/app/lib/use-content";
-import type { Program } from "@/app/lib/use-content";
 
+import type { Program } from "@/app/lib/use-content";
 export default function ProgramsPage() {
   const { user } = useAuth();
   const orgId = user?.orgId ?? "";
@@ -26,16 +28,14 @@ export default function ProgramsPage() {
   return (
     <div className="">
       <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Programs</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Manage community programs and activities
-          </p>
-        </div>
-        <button className="flex items-center gap-2 rounded-lg bg-green-700 px-4 py-2 font-medium text-white transition hover:bg-green-800">
+        <PageTitle
+          title="Programs"
+          description="Manage community programs and activities"
+        />
+        <Button>
           <Plus size={18} />
           New Program
-        </button>
+        </Button>
       </div>
 
       {!programs || programs.length === 0 ? (
@@ -44,10 +44,10 @@ export default function ProgramsPage() {
           <p className="mt-1 text-sm text-gray-400">
             Create your first program to get started.
           </p>
-          <button className="mx-auto mt-6 flex items-center gap-2 rounded-lg bg-green-700 px-4 py-2 font-medium text-white transition hover:bg-green-800">
+          <Button className="mx-auto mt-6">
             <Plus size={18} />
             New Program
-          </button>
+          </Button>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
@@ -84,9 +84,9 @@ export default function ProgramsPage() {
                 <span className="text-xs text-gray-500">
                   {new Date(program.createdAt).toLocaleDateString()}
                 </span>
-                <button className="rounded bg-gray-100 px-3 py-1 text-sm font-medium text-gray-900 transition hover:bg-gray-200">
+                <Button variant="outline" className="flex-1">
                   Edit
-                </button>
+                </Button>
               </div>
             </div>
           ))}

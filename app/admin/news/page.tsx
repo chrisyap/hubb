@@ -3,9 +3,12 @@
 import { Plus } from "lucide-react";
 
 import { useAuth } from "@/app/auth-context";
+import { Button } from "@/app/components/ui/button";
+import { Card } from "@/app/components/ui/card";
+import { PageTitle } from "@/app/components/ui/pageTitle";
 import { useContent } from "@/app/lib/use-content";
-import type { NewsItem } from "@/app/lib/use-content";
 
+import type { NewsItem } from "@/app/lib/use-content";
 export default function NewsPage() {
   const { user } = useAuth();
   const orgId = user?.orgId ?? "";
@@ -23,33 +26,26 @@ export default function NewsPage() {
   return (
     <div className="">
       <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            News & Announcements
-          </h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Keep your community informed
-          </p>
-        </div>
-        <button className="flex items-center gap-2 rounded-lg bg-green-700 px-4 py-2 font-medium text-white transition hover:bg-green-800">
+        <PageTitle
+          title="News & Announcements"
+          description="Keep your community informed"
+        />
+        <Button>
           <Plus size={18} />
           New Post
-        </button>
+        </Button>
       </div>
 
       {!news || news.length === 0 ? (
-        <div className="rounded-xl border border-gray-200 bg-white p-12 text-center">
+        <Card className="py-16 text-center">
           <p className="text-gray-500">
             No news posts yet. Create your first post!
           </p>
-        </div>
+        </Card>
       ) : (
         <div className="space-y-4">
           {news.map((post) => (
-            <div
-              key={post.id}
-              className="rounded-xl border border-gray-200 bg-white p-6 transition hover:border-gray-300"
-            >
+            <Card key={post.id}>
               <div className="mb-3 flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <h3 className="mb-1 text-lg font-semibold text-gray-900">
@@ -78,17 +74,18 @@ export default function NewsPage() {
                 </div>
               </div>
               <div className="mt-3 flex gap-2">
-                <button className="flex-1 rounded-lg bg-gray-100 px-3 py-2 text-sm font-medium text-gray-900 transition hover:bg-gray-200">
+                <Button variant="outline" className="flex-1">
                   Edit
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="outline"
+                  className="flex-1"
                   onClick={() => remove(post.id)}
-                  className="flex-1 rounded-lg bg-gray-100 px-3 py-2 text-sm font-medium text-gray-900 transition hover:bg-gray-200"
                 >
                   Delete
-                </button>
+                </Button>
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       )}

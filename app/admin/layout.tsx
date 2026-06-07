@@ -19,6 +19,8 @@ export default function AdminLayout({
   useEffect(() => {
     if (!isLoading && !user) {
       router.push("/login");
+    } else if (!isLoading && user && user.role !== "admin") {
+      router.push("/login?error=unauthorized");
     }
   }, [user, isLoading, router]);
 
@@ -30,7 +32,7 @@ export default function AdminLayout({
     );
   }
 
-  if (!user) {
+  if (!user || user.role !== "admin") {
     return null;
   }
 

@@ -1,19 +1,21 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
 import {
-  LayoutDashboard,
   Calendar,
   FileText,
-  Grid,
-  Users,
   FileUp,
+  Grid,
+  LayoutDashboard,
   Settings,
-} from "lucide-react"
+  Users,
+} from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+import { cn } from "@/lib/utils";
 
 interface SidebarProps {
-  isOpen: boolean
+  isOpen: boolean;
 }
 
 const menuItems = [
@@ -24,42 +26,56 @@ const menuItems = [
   { href: "/admin/members", label: "Members", icon: Users },
   { href: "/admin/documents", label: "Documents", icon: FileUp },
   { href: "/admin/settings", label: "Settings", icon: Settings },
-]
+];
 
 export default function Sidebar({ isOpen }: SidebarProps) {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   return (
     <div
-      className={`${
-        isOpen ? "w-64" : "w-0"
-      } overflow-hidden border-r border-gray-200 bg-white transition-all`}
+      className={cn(
+        "w-64 overflow-hidden border-r border-slate-200 bg-slate-50",
+        "dark:border-slate-700 dark:bg-slate-900",
+        isOpen ? "" : "-ml-64",
+      )}
     >
       <div className="p-6">
-        <h2 className="mb-8 font-serif text-2xl font-bold text-gray-900">Hubb</h2>
+        <h2 className="mb-8 font-serif text-2xl font-bold text-slate-900 dark:text-slate-100">
+          Hubb
+        </h2>
 
-        <nav className="space-y-2">
+        <nav className="space-y-3">
           {menuItems.map((item) => {
-            const Icon = item.icon
-            const isActive = pathname === item.href
+            const Icon = item.icon;
+            const isActive = pathname === item.href;
 
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 rounded-lg px-4 py-3 transition ${
-                  isActive
-                    ? "bg-green-100 text-green-700 font-semibold"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
+                className={cn(
+                  "flex items-start gap-3 py-1 text-sm transition",
+                  "border-transparent hover:border-l-2 hover:pl-3",
+                  isActive ? "border-l-2 border-green-700 pl-3" : "",
+                )}
               >
-                <Icon size={20} />
-                <span>{item.label}</span>
+                <Icon
+                  size={20}
+                  className="text-slate-700 dark:text-slate-300"
+                />
+                <span
+                  className={cn(
+                    "text-sm text-slate-900 dark:text-slate-300",
+                    "dark:text-slate-300",
+                  )}
+                >
+                  {item.label}
+                </span>
               </Link>
-            )
+            );
           })}
         </nav>
       </div>
     </div>
-  )
+  );
 }

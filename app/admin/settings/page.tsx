@@ -4,6 +4,17 @@ import { Loader2, LoaderCircle, Save } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { useAuth } from "@/app/auth-context";
+import { Button } from "@/app/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/app/components/ui/card";
+import { Input } from "@/app/components/ui/input";
+import { PageTitle } from "@/app/components/ui/pageTitle";
+import { cn } from "@/lib/utils";
 
 export default function SettingsPage() {
   const { user } = useAuth();
@@ -75,124 +86,128 @@ export default function SettingsPage() {
   return (
     <div className="">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Configure your organization&apos;s profile and branding
-        </p>
+        <PageTitle
+          title="Settings"
+          description="Configure your organization's profile and branding"
+        />
       </div>
 
       {/* Organization Info */}
-      <div className="mb-8 rounded-xl border border-gray-200 bg-white p-6">
-        <h3 className="mb-6 text-lg font-semibold text-gray-900">
-          Organization Info
-        </h3>
-        <div className="space-y-4">
-          <div>
-            <label className="mb-2 block text-sm font-medium text-gray-900">
-              Organization Name
-            </label>
-            <input
-              type="text"
-              value={orgName}
-              onChange={(e) => setOrgName(e.target.value)}
-              placeholder="My Community"
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-green-500 focus:outline-none"
-            />
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>Organization Info</CardTitle>
+          <CardDescription>
+            Configure your organization&apos;s profile and branding
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Organization Name
+              </label>
+              <Input
+                type="text"
+                value={orgName}
+                onChange={(e) => setOrgName(e.target.value)}
+                placeholder="My Community"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Email Address
+              </label>
+              <Input
+                type="email"
+                value={orgEmail}
+                onChange={(e) => setOrgEmail(e.target.value)}
+                placeholder="info@community.org"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Custom Domain
+              </label>
+              <Input
+                type="text"
+                value={domain}
+                onChange={(e) => setDomain(e.target.value)}
+                placeholder="www.yourorg.com"
+              />
+            </div>
           </div>
-          <div>
-            <label className="mb-2 block text-sm font-medium text-gray-900">
-              Email Address
-            </label>
-            <input
-              type="email"
-              value={orgEmail}
-              onChange={(e) => setOrgEmail(e.target.value)}
-              placeholder="info@community.org"
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-green-500 focus:outline-none"
-            />
-          </div>
-          <div>
-            <label className="mb-2 block text-sm font-medium text-gray-900">
-              Custom Domain
-            </label>
-            <input
-              type="text"
-              value={domain}
-              onChange={(e) => setDomain(e.target.value)}
-              placeholder="www.yourorg.com"
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-green-500 focus:outline-none"
-            />
-          </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Brand Colors */}
-      <div className="mb-8 rounded-xl border border-gray-200 bg-white p-6">
-        <h3 className="mb-6 text-lg font-semibold text-gray-900">
-          Brand Colors
-        </h3>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          <div>
-            <label className="mb-3 block text-sm font-medium text-gray-900">
-              Primary Color
-            </label>
-            <div className="flex items-center gap-3">
-              <input
-                type="color"
-                value={primaryColor}
-                onChange={(e) => setPrimaryColor(e.target.value)}
-                className="h-10 w-10 cursor-pointer rounded border border-gray-300"
-              />
-              <span className="font-mono text-sm text-gray-600">
-                {primaryColor}
-              </span>
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>Brand Colors</CardTitle>
+          <CardDescription>
+            Customize the primary, accent, and secondary colors for your
+            organization
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+            <div>
+              <label className="mb-3 block text-sm font-medium text-gray-900 dark:text-gray-300">
+                Primary Color
+              </label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="color"
+                  value={primaryColor}
+                  onChange={(e) => setPrimaryColor(e.target.value)}
+                  className="h-10 w-10 cursor-pointer rounded-xs border border-gray-300 dark:border-gray-600"
+                />
+                <span className="font-mono text-sm text-gray-600 dark:text-gray-400">
+                  {primaryColor}
+                </span>
+              </div>
+            </div>
+            <div>
+              <label className="mb-3 block text-sm font-medium text-gray-900 dark:text-gray-300">
+                Accent Color
+              </label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="color"
+                  value={accentColor}
+                  onChange={(e) => setAccentColor(e.target.value)}
+                  className="h-10 w-10 cursor-pointer rounded-xs border border-gray-300 bg-gray-100 dark:border-gray-600 dark:bg-gray-800"
+                />
+                <span className="font-mono text-sm text-gray-600 dark:text-gray-400">
+                  {accentColor}
+                </span>
+              </div>
+            </div>
+            <div>
+              <label className="mb-3 block text-sm font-medium text-gray-900 dark:text-gray-300">
+                Secondary Color
+              </label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="color"
+                  value={secondaryColor}
+                  onChange={(e) => setSecondaryColor(e.target.value)}
+                  className="h-10 w-10 cursor-pointer rounded-xs border border-gray-300 dark:border-gray-600"
+                />
+                <span className="font-mono text-sm text-gray-600 dark:text-gray-400">
+                  {secondaryColor}
+                </span>
+              </div>
             </div>
           </div>
-          <div>
-            <label className="mb-3 block text-sm font-medium text-gray-900">
-              Accent Color
-            </label>
-            <div className="flex items-center gap-3">
-              <input
-                type="color"
-                value={accentColor}
-                onChange={(e) => setAccentColor(e.target.value)}
-                className="h-10 w-10 cursor-pointer rounded border border-gray-300"
-              />
-              <span className="font-mono text-sm text-gray-600">
-                {accentColor}
-              </span>
-            </div>
-          </div>
-          <div>
-            <label className="mb-3 block text-sm font-medium text-gray-900">
-              Secondary Color
-            </label>
-            <div className="flex items-center gap-3">
-              <input
-                type="color"
-                value={secondaryColor}
-                onChange={(e) => setSecondaryColor(e.target.value)}
-                className="h-10 w-10 cursor-pointer rounded border border-gray-300"
-              />
-              <span className="font-mono text-sm text-gray-600">
-                {secondaryColor}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Save */}
       <div className="flex items-center gap-4">
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="flex items-center gap-2 rounded-lg bg-green-700 px-4 py-2.5 font-medium text-white transition hover:bg-green-800 disabled:opacity-50"
-        >
+        <Button onClick={handleSave} disabled={saving}>
           <Save size={16} />
           {saving ? "Saving..." : "Save Settings"}
-        </button>
+        </Button>
         {saved && (
           <span className="text-sm text-green-700">Settings saved!</span>
         )}

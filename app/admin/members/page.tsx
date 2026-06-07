@@ -4,9 +4,11 @@ import { LoaderCircle } from "lucide-react";
 import { useState } from "react";
 
 import { useAuth } from "@/app/auth-context";
+import { Button } from "@/app/components/ui/button";
+import { PageTitle } from "@/app/components/ui/pageTitle";
 import { useContent } from "@/app/lib/use-content";
-import type { Member } from "@/app/lib/use-content";
 
+import type { Member } from "@/app/lib/use-content";
 type FilterValue = "all" | "active" | "pending";
 
 export default function MembersPage() {
@@ -36,12 +38,10 @@ export default function MembersPage() {
   return (
     <div className="">
       <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Members</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Manage community members and signups
-          </p>
-        </div>
+        <PageTitle
+          title="Members"
+          description="Manage community members and signups"
+        />
         <div className="text-right">
           <p className="text-3xl font-bold text-green-700">
             {members?.length ?? 0}
@@ -52,17 +52,17 @@ export default function MembersPage() {
 
       <div className="mb-8 flex gap-2">
         {(["all", "active", "pending"] as const).map((f) => (
-          <button
+          <Button
             key={f}
             onClick={() => setFilter(f)}
-            className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
+            className={`transition ${
               filter === f
                 ? "bg-green-700 text-white"
                 : "bg-gray-100 text-gray-900 hover:bg-gray-200"
             }`}
           >
             {f.charAt(0).toUpperCase() + f.slice(1)}
-          </button>
+          </Button>
         ))}
       </div>
 
