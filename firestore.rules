@@ -1,15 +1,15 @@
 rules_version = '2';
 
 // White-label multi-org Firestore Security Rules
-// Each document stores an orgId field matching the authenticated user's org.
-// Admins are identified by a custom claim { admin: true } on the Firebase Auth user.
+// Admins are identified by a Firestore document role field.
+// The server-side API routes use firebase-admin SDK which bypasses these rules.
 
 function isAuthenticated() {
   return request.auth != null;
 }
 
 function isAdmin() {
-  return isAuthenticated() && request.auth.token.admin == true;
+  return isAuthenticated() && get(/databases/$(database)/documents/members/$(request.auth.uid)).data.role == "admin";
 }
 
 function belongsToOrg(orgId) {
@@ -61,7 +61,7 @@ service cloud.firestore {
     }
 
     match /pages/{docId} {
-      allow read: if true;  // public — for the public-facing site
+      allow read: if true;  // public
       allow write: if isAdmin();
     }
 
@@ -75,7 +75,15 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // Public site reads (unauthenticated users can see public content)
+    // Invitations — admin create, public read by token, admin list/delete
+    match /invitations/{docId} {
+      allow read: if isAdmin();
+      allow create: if isAdmin();
+      allow write: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Public site reads
     match /public_site/{docId} {
       allow read: if true;
       allow write: if isAdmin();
