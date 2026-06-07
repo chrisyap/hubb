@@ -84,6 +84,20 @@ export interface Sponsor {
   createdAt: string;
 }
 
+export interface Invitation {
+  id: string;
+  email: string;
+  role: "admin";
+  orgId: string;
+  orgName: string;
+  invitedBy: string;
+  invitedByName: string;
+  status: "pending" | "accepted";
+  token: string;
+  createdAt: string;
+  expiresAt: string;
+}
+
 type ContentTypes =
   | Event
   | NewsItem
@@ -91,7 +105,8 @@ type ContentTypes =
   | Member
   | Document
   | CommitteeMember
-  | Sponsor;
+  | Sponsor
+  | Invitation;
 
 interface ApiResponse<T> {
   data: T[] | undefined;

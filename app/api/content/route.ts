@@ -12,6 +12,7 @@ const VALID_COLLECTIONS = new Set([
   "pages",
   "committee_members",
   "sponsors",
+  "invitations",
 ]);
 
 export const runtime = "nodejs";

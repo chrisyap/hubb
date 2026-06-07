@@ -7,6 +7,7 @@ import {
   Grid,
   LayoutDashboard,
   Settings,
+  Shield,
   Users,
 } from "lucide-react";
 import Link from "next/link";
@@ -20,6 +21,7 @@ interface SidebarProps {
 
 const menuItems = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/users", label: "Admin Users", icon: Shield },
   { href: "/admin/events", label: "Events", icon: Calendar },
   { href: "/admin/news", label: "News & Announcements", icon: FileText },
   { href: "/admin/programs", label: "Programs", icon: Grid },
