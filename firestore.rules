@@ -1,37 +1,29 @@
 rules_version = '2';
 
-// White-label multi-org Firestore Security Rules
-// Admins are identified by a Firestore document role field.
-// The server-side API routes use firebase-admin SDK which bypasses these rules.
-
-function isAuthenticated() {
-  return request.auth != null;
-}
-
-function isAdmin() {
-  return isAuthenticated() && get(/databases/$(database)/documents/members/$(request.auth.uid)).data.role == "admin";
-}
-
-function belongsToOrg(orgId) {
-  return isAuthenticated() && request.auth.token.orgId == orgId;
-}
-
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ---- Orgs collection ----
+    function isAuthenticated() {
+      return request.auth != null
+        && exists(
+          /databases/$(database)/documents/members/$(request.auth.uid)
+        );
+    }
+
+    function isAdmin() {
+      return isAuthenticated()
+        && get(
+          /databases/$(database)/documents/members/$(request.auth.uid)
+        ).data.role == "admin";
+    }
+
+    function belongsToOrg(orgId) {
+      return isAuthenticated() && request.auth.token.orgId == orgId;
+    }
+
     match /orgs/{orgId} {
       allow read: if isAuthenticated();
       allow write: if isAuthenticated() && request.auth.token.orgId == orgId;
-    }
-
-    // ---- Content collections (scoped by orgId) ----
-    function isOrgDoc() {
-      return resource.data.orgId == request.auth.token.orgId;
-    }
-
-    function incomingOrgDoc() {
-      return request.resource.data.orgId == request.auth.token.orgId;
     }
 
     match /events/{docId} {
@@ -61,21 +53,20 @@ service cloud.firestore {
     }
 
     match /pages/{docId} {
-      allow read: if true;  // public
+      allow read: if true;
       allow write: if isAdmin();
     }
 
     match /committee_members/{docId} {
-      allow read: if true;  // public
+      allow read: if true;
       allow write: if isAdmin();
     }
 
     match /sponsors/{docId} {
-      allow read: if true;  // public
+      allow read: if true;
       allow write: if isAdmin();
     }
 
-    // Invitations — admin create, public read by token, admin list/delete
     match /invitations/{docId} {
       allow read: if isAdmin();
       allow create: if isAdmin();
@@ -83,7 +74,6 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
-    // Public site reads
     match /public_site/{docId} {
       allow read: if true;
       allow write: if isAdmin();
